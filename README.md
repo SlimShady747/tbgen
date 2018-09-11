@@ -26,9 +26,18 @@ bottom change print_module_head to print_module_head_orig.
 2. Generate a reset if reset is detected.
 3. Put comments in the generated file.
 4. Put an include for you user-generated code. This is important because if you change the generated file and regenerate it, you'll lose your changes.
-5. Changed $dumvars to level 2
+5. Changed $dumpvars to level 2
 6. Added a simple example
 
 Nothing major, and -- of course -- this is just a template to get you started but don't forget
 that any changes you make will be clobbered if you regenerate the testbench!
 
+Example
+-------
+
+    python tbgen.py top.v top.tb.v
+    iverilog top.tb.v top.v -o top
+    vvp top
+    gtkwave db_tb_top.vcd
+
+Or try http://edaplayground.com if you don't want to install iverilog and gtkwave.
