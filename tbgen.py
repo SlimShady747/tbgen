@@ -5,6 +5,8 @@
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a beer in return Xiongfei(Alex) Guo.
 
+# some minor additions by Al Williams 2018-9-11
+
 '''
 Created on 2010-4-23
 
@@ -144,10 +146,13 @@ class TestbenchGenerator(object):
         self.printo("\n")
     
     def print_clock_gen(self):
-        fsdb = "    $dumpfile(\"db_tb_%s.vcd\");\n    $dumpvars(0, tb_%s);\n" % (self.mod_name, self.mod_name)
+        fsdb = "    $dumpfile(\"db_tb_%s.vcd\");\n    $dumpvars(2, tb_%s);\n" % (self.mod_name, self.mod_name)
 
-        clock_gen_text = "\nparameter PERIOD = 10;\n\ninitial begin\n%s    CLK = 1'b0;\n    #(PERIOD/2);\n    forever\n        #(PERIOD/2) CLK = ~CLK;\nend\n\n" % fsdb
+        clock_gen_text = "\nparameter PERIOD = 10; //adjust for your timescale\n\ninitial begin\n%s    CLK = 1'b0;\n    #(PERIOD/2);\n    forever\n        #(PERIOD/2) CLK = ~CLK;\nend\n" % fsdb
         self.printo(re.sub('CLK', self.clock_name, clock_gen_text))
+        if self.reset_name!="":
+            clock_gen_text = "\ninitial begin // invert if reset is negative\n        RST=1'b0;\n         #(PERIOD*2) RST=~RST;\n         #PERIOD RST=~RST;\n         end\n"
+            self.printo(re.sub('RST',self.reset_name, clock_gen_text))
         
     def find_clk_rst(self):
         for pin in self.pin_list:
@@ -162,11 +167,14 @@ class TestbenchGenerator(object):
                 print "I think your reset signal is '%s'." % pin[1]
                 break
 
-    def print_module_head(self):
+    def print_module_head_orig(self):
         self.printo("`include \"timescale.v\"\nmodule tb_%s;\n\n" % self.mod_name)
+
+    def print_module_head(self):
+        self.printo("`timescale 1ns/100ps //Adjust to suit\n\nmodule tb_%s;\n\n" % self.mod_name)
         
     def print_module_end(self):
-        self.printo("endmodule\n")
+        self.printo("`include \"user.tb_%s.v\"\nendmodule\n" % self.mod_name)
 
     def printo(self, cont):
         self.ofile.write(cont)
