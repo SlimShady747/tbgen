@@ -45,7 +45,7 @@ Or try http://edaplayground.com if you don't want to install iverilog and gtkwav
 
 Command line
 ------------
-    usage: tbgen.py [-h] [-p PERIOD] [-t TIMESCALE] [-d DUMPFILE] [-l LEVEL]
+    usage: tbgen.py [-h] [-p PERIOD] [-t TIMESCALE] [-d DUMPFILE] [-l LEVEL] [-r]
                     input_file [output_file]
     
     Automatically generate Verilog testbench
@@ -64,3 +64,4 @@ Command line
                             set dumpfile (default=tb_output.vcd)
       -l LEVEL, --level LEVEL
                             set dump depth level (usually 0,1, or 2; default=2)
+      -r, --resetneg        set reset to negative (default positive)			    

@@ -146,13 +146,13 @@ class TestbenchGenerator(object):
         self.printo(self.align_print(list(map(lambda x:(x[3], x[2], x[1], ';'), self.pin_list)), 4))
         self.printo("\n")
     
-    def print_clock_gen(self,period,dfile,depth):
+    def print_clock_gen(self,period,dfile,depth,resetpol):
         fsdb = "    $dumpfile(\"%s\");\n    $dumpvars(%d, tb_%s);\n" % (dfile, depth, self.mod_name)
 
         clock_gen_text = "\nparameter PERIOD = %d; //adjust for your timescale\n\ninitial begin\n%s    CLK = 1'b0;\n    #(PERIOD/2);\n    forever\n        #(PERIOD/2) CLK = ~CLK;\nend\n" % (period, fsdb)
         self.printo(re.sub('CLK', self.clock_name, clock_gen_text))
         if self.reset_name!="":
-            clock_gen_text = "\ninitial begin // invert if reset is negative\n        RST=1'b0;\n         #(PERIOD*2) RST=~RST;\n         #PERIOD RST=~RST;\n         end\n"
+            clock_gen_text = "\ninitial begin\n        RST=1'b%d;\n         #(PERIOD*2) RST=~RST;\n         #PERIOD RST=~RST;\n         end\n" % resetpol
             self.printo(re.sub('RST',self.reset_name, clock_gen_text))
         
     def find_clk_rst(self):
@@ -216,7 +216,8 @@ License: Beerware
     aparse.add_argument('-p','--period', type=int, help='set period in clock ticks (default=10)', default=10)
     aparse.add_argument('-t','--timescale',help='set timescale (default=1ns/10ps)', default='1ns/10ps')
     aparse.add_argument('-d','--dumpfile',help='set dumpfile (default=tb_output.vcd)', default='tb_output.vcd')
-    aparse.add_argument('-l','--level', type=int, help='set dump depth level (usually 0,1, or 2; default=2)', default=2)                    
+    aparse.add_argument('-l','--level', type=int, help='set dump depth level (usually 0,1, or 2; default=2)', default=2)
+    aparse.add_argument('-r','--resetneg', help='set reset to negative (default positive)', action='store_const', const=1, default=0)                        
     args = aparse.parse_args()
 
     tbg = TestbenchGenerator(args.input_file, args.output_file)
@@ -224,7 +225,7 @@ License: Beerware
     tbg.print_module_head(args.timescale)
     tbg.print_wires()
     tbg.print_dut()
-    tbg.print_clock_gen(args.period,args.dumpfile,args.level)
+    tbg.print_clock_gen(args.period,args.dumpfile,args.level,args.resetneg)
     tbg.print_module_end()
     tbg.close()
 
