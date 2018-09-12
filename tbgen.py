@@ -168,14 +168,17 @@ class TestbenchGenerator(object):
                 print("Reset signal detected: '%s'." % pin[1])
                 break
 
+# Original code -- no longer used
     def print_module_head_orig(self):
         self.printo("`include \"timescale.v\"\nmodule tb_%s;\n\n" % self.mod_name)
 
     def print_module_head(self,timescale):
         self.printo("`timescale %s //Adjust to suit\n\nmodule tb_%s;\n\n" % (timescale,self.mod_name))
         
-    def print_module_end(self):
-        self.printo("`include \"user.tb_%s.v\"\nendmodule\n" % self.mod_name)
+    def print_module_end(self,iname):
+        if iname is None:
+            iname='user.tb_%s.v' % self.mod_name
+        self.printo("`include \"%s\"\nendmodule\n" % iname)
 
     def printo(self, cont):
         self.ofile.write(cont)
@@ -217,15 +220,17 @@ License: Beerware
     aparse.add_argument('-t','--timescale',help='set timescale (default=1ns/10ps)', default='1ns/10ps')
     aparse.add_argument('-d','--dumpfile',help='set dumpfile (default=tb_output.vcd)', default='tb_output.vcd')
     aparse.add_argument('-l','--level', type=int, help='set dump depth level (usually 0,1, or 2; default=2)', default=2)
-    aparse.add_argument('-r','--resetneg', help='set reset to negative (default positive)', action='store_const', const=1, default=0)                        
+    aparse.add_argument('-r','--resetneg', help='set reset to negative (default positive)', action='store_const', const=1, default=0)
+    aparse.add_argument('-i','--include', help='sets user include file name (default=user.tb_<name>.v)', default=None)                            
     args = aparse.parse_args()
 
     tbg = TestbenchGenerator(args.input_file, args.output_file)
+ 
 
     tbg.print_module_head(args.timescale)
     tbg.print_wires()
     tbg.print_dut()
     tbg.print_clock_gen(args.period,args.dumpfile,args.level,args.resetneg)
-    tbg.print_module_end()
+    tbg.print_module_end(args.include)
     tbg.close()
 

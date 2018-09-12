@@ -1,4 +1,5 @@
 `default_nettype none
+`timescale 1ns/10ps
 module top(input clk, input rst, input run, input hold, output LED1, output LED2, output LED3,
 	   output LED4, output LED5);
 

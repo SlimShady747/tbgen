@@ -25,7 +25,7 @@ can rename print_module_head_orig to print_module_head (and delete the current o
 bottom change print_module_head to print_module_head_orig.
 2. Generate a reset if reset is detected.
 3. Put comments in the generated file.
-4. Put an include for you user-generated code. This is important because if you change the generated file and regenerate it, you'll lose your changes.
+4. Put an include for your user-generated code. This is important because if you change the generated file and regenerate it, you'll lose your changes.
 5. Changed $dumpvars to level 2
 6. Added a simple example
 7. Added command line options
@@ -65,3 +65,5 @@ Command line
       -l LEVEL, --level LEVEL
                             set dump depth level (usually 0,1, or 2; default=2)
       -r, --resetneg        set reset to negative (default positive)			    
+      -i INCLUDE, --include INCLUDE
+                            sets user include file name (default=user.tb_<name>.v)
