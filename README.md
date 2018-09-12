@@ -86,6 +86,7 @@ the reset placeholder.
 
 Here are the known placeholders:
     %%%TIMESCALE%%%% - The entire timescale directive (If you prefer to use an include here, just omit this and put the include in your template)
+```    
     %%%HEAD%%% - The module line
     %%%WIRES%%% - All the wires and regs needed for the testbench
     %%%UUT%%% - The UUT instance (needs an open parenthesis after it)
@@ -95,6 +96,7 @@ Here are the known placeholders:
     %%%CLOCK%%% - Clock generation code
     %%%RESET%%% - Reset generation code
     %%%INCLUDE%%% - User include string
+```
 
 Note you have to provide a few things in the template such as the syntax between the UUT
 instance and its arguments. DUMP, and RESET need to be inside initial blocks. I
@@ -103,6 +105,7 @@ did change the CLOCK text to use an always block so it would stand alone so that
 The file template.v shows an example custom template
 
 Here is the current default template:
+```
     // Auto generatated test bench (internal tbgen.py template)
     %%%TIMESCALE%%%
     %%%HEAD%%%
@@ -121,5 +124,5 @@ Here is the current default template:
     %%%INCLUDE%%%
     
     endmodule
-
+```
 			    
