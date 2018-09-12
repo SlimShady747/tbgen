@@ -85,8 +85,8 @@ You can omit placeholders (for example, if you don't want the reset code, leave 
 the reset placeholder.
 
 Here are the known placeholders:
-    %%%TIMESCALE%%%% - The entire timescale directive (If you prefer to use an include here, just omit this and put the include in your template)
 ```    
+    %%%TIMESCALE%%%% - The entire timescale directive (If you prefer to use an include here, just omit this and put the include in your template)
     %%%HEAD%%% - The module line
     %%%WIRES%%% - All the wires and regs needed for the testbench
     %%%UUT%%% - The UUT instance (needs an open parenthesis after it)
