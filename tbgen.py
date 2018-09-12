@@ -15,6 +15,7 @@ Created on 2010-4-23
 
 import re
 import sys
+import argparse
 
 class TestbenchGenerator(object):
     '''
@@ -34,7 +35,7 @@ class TestbenchGenerator(object):
         self.reset_name = 'rst'
         
         if vfile_name == None:
-            sys.stderr.write("ERROR: You aren't specfic a input file name.\n")
+            sys.stderr.write("ERROR: You did not provide an input file name.\n")
             sys.exit(1)
         else:
             self.open()
@@ -58,7 +59,7 @@ class TestbenchGenerator(object):
                 if(self.ofile_name == None):
                     ofname = "tb_%s.v" % self.mod_name
                     self.ofile = open(ofname, 'w')
-                    print("Your did not specify an output file name, use '%s' instead." % ofname)
+                    print("You did not specify an output file name, using '%s'." % ofname)
                 else:
                     self.ofile = open(self.ofile_name, 'w')
                     print("Output file is '%s'." % self.ofile_name)
@@ -145,10 +146,10 @@ class TestbenchGenerator(object):
         self.printo(self.align_print(list(map(lambda x:(x[3], x[2], x[1], ';'), self.pin_list)), 4))
         self.printo("\n")
     
-    def print_clock_gen(self):
-        fsdb = "    $dumpfile(\"db_tb_%s.vcd\");\n    $dumpvars(2, tb_%s);\n" % (self.mod_name, self.mod_name)
+    def print_clock_gen(self,period,dfile,depth):
+        fsdb = "    $dumpfile(\"%s\");\n    $dumpvars(%d, tb_%s);\n" % (dfile, depth, self.mod_name)
 
-        clock_gen_text = "\nparameter PERIOD = 10; //adjust for your timescale\n\ninitial begin\n%s    CLK = 1'b0;\n    #(PERIOD/2);\n    forever\n        #(PERIOD/2) CLK = ~CLK;\nend\n" % fsdb
+        clock_gen_text = "\nparameter PERIOD = %d; //adjust for your timescale\n\ninitial begin\n%s    CLK = 1'b0;\n    #(PERIOD/2);\n    forever\n        #(PERIOD/2) CLK = ~CLK;\nend\n" % (period, fsdb)
         self.printo(re.sub('CLK', self.clock_name, clock_gen_text))
         if self.reset_name!="":
             clock_gen_text = "\ninitial begin // invert if reset is negative\n        RST=1'b0;\n         #(PERIOD*2) RST=~RST;\n         #PERIOD RST=~RST;\n         end\n"
@@ -170,8 +171,8 @@ class TestbenchGenerator(object):
     def print_module_head_orig(self):
         self.printo("`include \"timescale.v\"\nmodule tb_%s;\n\n" % self.mod_name)
 
-    def print_module_head(self):
-        self.printo("`timescale 1ns/100ps //Adjust to suit\n\nmodule tb_%s;\n\n" % self.mod_name)
+    def print_module_head(self,timescale):
+        self.printo("`timescale %s //Adjust to suit\n\nmodule tb_%s;\n\n" % (timescale,self.mod_name))
         
     def print_module_end(self):
         self.printo("`include \"user.tb_%s.v\"\nendmodule\n" % self.mod_name)
@@ -208,19 +209,22 @@ Author: Xiongfei(Alex) Guo <xfguo@credosemi.com>
 License: Beerware
 ''')
     ofile_name = None
-    if len(sys.argv) == 1:
-        sys.stderr.write("ERROR: You aren't specfic a input file name.\n")
-        print("Usage: tbgen input_verilog_file_name [output_testbench_file_name]")
-        sys.exit(1)
-    elif len(sys.argv) == 3:
-        ofile_name = sys.argv[2]
         
-    tbg = TestbenchGenerator(sys.argv[1], ofile_name)
+    aparse = argparse.ArgumentParser(description='Automatically generate Verilog testbench')
+    aparse.add_argument('input_file',  help='input Verilog file')
+    aparse.add_argument('output_file', help='output Verilog testbench', nargs='?', default=None)
+    aparse.add_argument('-p','--period', type=int, help='set period in clock ticks (default=10)', default=10)
+    aparse.add_argument('-t','--timescale',help='set timescale (default=1ns/10ps)', default='1ns/10ps')
+    aparse.add_argument('-d','--dumpfile',help='set dumpfile (default=tb_output.vcd)', default='tb_output.vcd')
+    aparse.add_argument('-l','--level', type=int, help='set dump depth level (usually 0,1, or 2; default=2)', default=2)                    
+    args = aparse.parse_args()
 
-    tbg.print_module_head()
+    tbg = TestbenchGenerator(args.input_file, args.output_file)
+
+    tbg.print_module_head(args.timescale)
     tbg.print_wires()
     tbg.print_dut()
-    tbg.print_clock_gen()
+    tbg.print_clock_gen(args.period,args.dumpfile,args.level)
     tbg.print_module_end()
     tbg.close()
 
