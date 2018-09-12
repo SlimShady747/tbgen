@@ -65,7 +65,7 @@ class TestbenchGenerator(object):
                     print("Output file is '%s'." % self.ofile_name)
             else:
                 self.ofile = open(ofile_name, 'w')
-                print "Output file is '%s'." % ofile_name
+                print("Output file is '%s'." % ofile_name)
         except Exception as e:
             print("ERROR: Output file error. \n ERROR:    %s" % e)
             sys.exit(1)
