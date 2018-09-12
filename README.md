@@ -85,7 +85,7 @@ The template file can have anything you want in it and placeholders will get rew
 You can omit placeholders (for example, if you don't want the reset code, leave out
 the reset placeholder.
 
-Here are the known placeholders:
+Here are the known high-level placeholders:
 ```    
     %%%TIMESCALE%%%% - The entire timescale directive (If you prefer to use an include here, just omit this and put the include in your template)
     %%%HEAD%%% - The module line
@@ -98,13 +98,26 @@ Here are the known placeholders:
     %%%RESET%%% - Reset generation code
     %%%INCLUDE%%% - User include string
 ```
+If you want your template to have more control, you can also use these lower level
+placeholders to get things like the module name, the name of the clock pin, etc.
+```
+    %%%UUTMOD%%% - UUT module name only
+    %%%VCDFILE%%% - VCD file name only
+    %%%DLEVEL%%% - VCD Level
+    %%%NPERIOD%%% - Numeric period
+    %%%CSIGNAL%%% - Clock Signal
+    %%%RSIGNAL%%% - Reset Signal
+    %%%RPOLARITY%%% - Normal state of clock (1 or 0)
+    %%%INCLUDEFILE%%% - Name of user include
+```
 
 Note you have to provide a few things in the template such as the syntax between the UUT
 instance and its arguments. DUMP, and RESET need to be inside initial blocks. I
 did change the CLOCK text to use an always block so it would stand alone so that's different from the original code. Another change from the original is that reg variables now initialize to
 zero when declared.
 
-The file template.v shows an example custom template
+The file template.v shows an example custom template. The template1.v file shows one
+that controls more of the actual code generation using lower-level placeholders.
 
 Here is the current default template:
 ```

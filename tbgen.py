@@ -6,6 +6,7 @@
 # this stuff is worth it, you can buy me a beer in return Xiongfei(Alex) Guo.
 
 # some minor additions by Al Williams 2018-9-11
+# Ok, maybe some major additions (templates)
 
 '''
 Created on 2010-4-23
@@ -137,35 +138,36 @@ class TestbenchGenerator(object):
                 max_len = len(pin_name)
         
         
-#        self.printo( "%s uut (\n" % self.mod_name )
         tmp="%s uut\n" % self.mod_name
-        self.otext=re.sub(r"%%%UUT%%%",tmp,self.otext)
+        self.otext=re.sub('%%%UUT%%%',tmp,self.otext)
         align_cont = self.align_print(list(map(lambda x:("", "." + x[1], "(", x[1], '),'), self.pin_list)), 4)
         align_cont = align_cont[:-2] + "\n"
 
-#        self.printo( align_cont )
-        self.otext=re.sub(r"%%%ARGS%%%",align_cont,self.otext)
-#        self.printo( ");\n" )
+        self.otext=re.sub('%%%ARGS%%%',align_cont,self.otext)
         
     def print_wires(self):
         tmp=self.align_print(list(map(lambda x:(x[3], x[2], x[1], '=0;' if x[3]=='reg' else ';'), self.pin_list)), 4)
         tmp+="\n"
-        self.otext=re.sub(r"%%%WIRES%%%",tmp,self.otext)
+        self.otext=re.sub('%%%WIRES%%%',tmp,self.otext)
     
     def print_clock_gen(self,period,dfile,depth,resetpol):
+        self.otext=re.sub('%%%VCDFILE%%%',dfile,self.otext)
+        self.otext=re.sub('%%%DLEVEL%%%',str(depth),self.otext)
         fsdb = "\t$dumpfile(\"%s\");\n\t$dumpvars(%d, tb_%s);" % (dfile, depth, self.mod_name)
-        self.otext=re.sub(r"%%%DUMP%%%",fsdb,self.otext)
+        self.otext=re.sub('%%%DUMP%%%',fsdb,self.otext)
 
         tmp="parameter PERIOD=%d;" % period
-        self.otext=re.sub(r"%%%PERIOD%%%",tmp,self.otext)
+        self.otext=re.sub('%%%PERIOD%%%',tmp,self.otext)
+        self.otext=re.sub('%%%NPERIOD%%%',str(period),self.otext)
         clock_gen_text = re.sub('CLK',self.clock_name,"always\n\t#(PERIOD/2) CLK = ~CLK;")
-#        self.printo(re.sub('CLK', self.clock_name, clock_gen_text))
-        self.otext=re.sub(r"%%%CLOCK%%%",clock_gen_text,self.otext)
+        self.otext=re.sub('%%%CLOCK%%%',clock_gen_text,self.otext)
+        self.otext=re.sub('%%%CSIGNAL%%%',self.clock_name,self.otext)
         if self.reset_name!="":
             clock_gen_text = "\tRST=1'b%d;\n\t#(PERIOD*2) RST=~RST;\n\t#PERIOD RST=~RST;" % resetpol
-#            self.printo(re.sub('RST',self.reset_name, clock_gen_text))
             tmp=re.sub('RST',self.reset_name,clock_gen_text)
-            self.otext=re.sub(r"%%%RESET%%%",tmp,self.otext)
+            self.otext=re.sub('%%%RESET%%%',tmp,self.otext)
+            self.otext=re.sub('%%%RSIGNAL%%%',self.reset_name,self.otext)
+            self.otext=re.sub('%%%RPOLARITY%%%',str(resetpol),self.otext)
         
     def find_clk_rst(self):
         for pin in self.pin_list:
@@ -181,14 +183,15 @@ class TestbenchGenerator(object):
                 break
 
     def print_module_head(self,timescale):
-        self.otext=re.sub(r"%%%TIMESCALE%%%","`timescale %s" % timescale, self.otext)
-        self.otext=re.sub(r"%%%HEAD%%%","module tb_%s;" % self.mod_name,self.otext)
+        self.otext=re.sub('%%%TIMESCALE%%%',"`timescale %s" % timescale, self.otext)
+        self.otext=re.sub('%%%HEAD%%%',"module tb_%s;" % self.mod_name,self.otext)
         
     def print_module_end(self,iname):
         if iname is None:
             iname='user.tb_%s.v' % self.mod_name
-#        self.printo("`include \"%s\"\nendmodule\n" % iname)
-        self.otext=re.sub(r"%%%INCLUDE%%%","`include \"%s\"" % iname,self.otext)
+        self.otext=re.sub('%%%INCLUDE%%%',"`include \"%s\"" % iname,self.otext)
+        self.otext=re.sub('%%%INCLUDEFILE%%%',iname,self.otext)
+        
 
 
     def printo(self, cont):
@@ -245,6 +248,8 @@ end\n\
 endmodule\n\
 "
     def write_template(self):
+        # global subs
+        self.otext=re.sub('%%%UUTMOD%%%',self.mod_name,self.otext);
         self.printo("%s" % self.otext)
 
 if __name__ == "__main__":
