@@ -30,6 +30,7 @@ bottom change print_module_head to print_module_head_orig.
 6. Added a simple example
 7. Added command line options
 8. Based testbench on optional template file
+9. Template change also initializes reg values to 0 when declared
 
 Nothing major, and -- of course -- this is just a template to get you started but don't forget
 that any changes you make will be clobbered if you regenerate the testbench!
@@ -100,7 +101,8 @@ Here are the known placeholders:
 
 Note you have to provide a few things in the template such as the syntax between the UUT
 instance and its arguments. DUMP, and RESET need to be inside initial blocks. I
-did change the CLOCK text to use an always block so it would stand alone so that's different from the original code.
+did change the CLOCK text to use an always block so it would stand alone so that's different from the original code. Another change from the original is that reg variables now initialize to
+zero when declared.
 
 The file template.v shows an example custom template
 
