@@ -1,3 +1,4 @@
+`include "./full_adder.v"
 `timescale 1ns/10ps //Adjust to suit
 
 module tb_full_adder;
@@ -32,5 +33,4 @@ initial begin
          #(PERIOD*2) rst=~rst;
          #PERIOD rst=~rst;
          end
-`include "user.tb_full_adder.v"
 endmodule
