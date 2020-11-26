@@ -7,6 +7,8 @@
 
 # some minor additions by Al Williams 2018-9-11
 
+# some minor additions by Dani Sulam (a.k.a Phantom Assassin) 2020-11-26 
+
 '''
 Created on 2010-4-23
 
@@ -100,7 +102,7 @@ class TestbenchGenerator(object):
         pin_list = self.clean_other(self.vcont) 
         
         comp_pin_list_pre = []
-        for i in re.findall(r'(input|output|inout)[\s]+([^;,\)]+)[\s]*[;,]', pin_list):
+        for i in re.findall(r'(input|output|inout)[\s]+([^;,\)]+)[\s]*[;,]*', pin_list):
             comp_pin_list_pre.append((i[0], re.sub(r"^reg[\s]*", "", i[1])))
             
         comp_pin_list = []
